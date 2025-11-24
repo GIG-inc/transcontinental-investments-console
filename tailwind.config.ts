@@ -57,11 +57,38 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        // Transcontinental Investments custom palette
+        "ti-black": "hsl(var(--ti-black))",
+        "ti-white": "hsl(var(--ti-white))",
+        "ti-grey": {
+          50: "hsl(var(--ti-grey-50))",
+          100: "hsl(var(--ti-grey-100))",
+          200: "hsl(var(--ti-grey-200))",
+          300: "hsl(var(--ti-grey-300))",
+          400: "hsl(var(--ti-grey-400))",
+          500: "hsl(var(--ti-grey-500))",
+          600: "hsl(var(--ti-grey-600))",
+          700: "hsl(var(--ti-grey-700))",
+          800: "hsl(var(--ti-grey-800))",
+          900: "hsl(var(--ti-grey-900))",
+        },
+        "ti-success": "hsl(var(--ti-success))",
+        "ti-success-light": "hsl(var(--ti-success-light))",
+        "ti-error": "hsl(var(--ti-error))",
+        "ti-error-light": "hsl(var(--ti-error-light))",
+        "ti-warning": "hsl(var(--ti-warning))",
+        "ti-info": "hsl(var(--ti-info))",
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        input: "var(--radius-input)",
+        button: "var(--radius-button)",
+        chip: "var(--radius-chip)",
+      },
+      fontFamily: {
+        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
       },
       keyframes: {
         "accordion-down": {
