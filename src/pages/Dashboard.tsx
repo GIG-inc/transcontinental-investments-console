@@ -2,28 +2,20 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { LogOut } from "lucide-react";
 import logoBlack from "@/assets/logo-black.png";
-
 export default function Dashboard() {
   const handleLogout = () => {
     // API Integration Point: POST /api/auth/logout
     // Clear session/token and redirect to login
     window.location.href = "/auth/login";
   };
-
-  return (
-    <div className="min-h-screen bg-ti-grey-50">
+  return <div className="min-h-screen bg-ti-grey-50">
       {/* Header */}
       <header className="bg-ti-white border-b border-ti-grey-200 sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <img src={logoBlack} alt="Transcontinental Investments" className="h-8" />
+            <img src={logoBlack} alt="Transcontinental Investments" className="h-20 w-40" />
             
-            <Button
-              variant="authGhost"
-              size="sm"
-              onClick={handleLogout}
-              className="flex items-center gap-2"
-            >
+            <Button variant="authGhost" size="sm" onClick={handleLogout} className="flex items-center gap-2">
               <LogOut className="w-4 h-4" />
               Sign Out
             </Button>
@@ -33,12 +25,15 @@ export default function Dashboard() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="space-y-8"
-        >
+        <motion.div initial={{
+        opacity: 0,
+        y: 20
+      }} animate={{
+        opacity: 1,
+        y: 0
+      }} transition={{
+        duration: 0.5
+      }} className="space-y-8">
           <div>
             <h1 className="text-4xl font-bold text-ti-black mb-2">Dashboard</h1>
             <p className="text-lg text-ti-grey-600">
@@ -47,18 +42,28 @@ export default function Dashboard() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[
-              { title: "Portfolio Value", value: "$---.---", change: "--%" },
-              { title: "Total Returns", value: "$--.--", change: "--%" },
-              { title: "Active Investments", value: "--", change: "-- new" },
-            ].map((stat, index) => (
-              <motion.div
-                key={stat.title}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 0.1 * index }}
-                className="bg-ti-white rounded-input border border-ti-grey-200 p-6"
-              >
+            {[{
+            title: "Portfolio Value",
+            value: "$---.---",
+            change: "--%"
+          }, {
+            title: "Total Returns",
+            value: "$--.--",
+            change: "--%"
+          }, {
+            title: "Active Investments",
+            value: "--",
+            change: "-- new"
+          }].map((stat, index) => <motion.div key={stat.title} initial={{
+            opacity: 0,
+            y: 20
+          }} animate={{
+            opacity: 1,
+            y: 0
+          }} transition={{
+            duration: 0.4,
+            delay: 0.1 * index
+          }} className="bg-ti-white rounded-input border border-ti-grey-200 p-6">
                 <h3 className="text-sm font-medium text-ti-grey-600 mb-2">
                   {stat.title}
                 </h3>
@@ -68,16 +73,19 @@ export default function Dashboard() {
                 <p className="text-sm text-ti-success font-medium">
                   {stat.change}
                 </p>
-              </motion.div>
-            ))}
+              </motion.div>)}
           </div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-            className="bg-ti-white rounded-input border border-ti-grey-200 p-8 text-center"
-          >
+          <motion.div initial={{
+          opacity: 0,
+          y: 20
+        }} animate={{
+          opacity: 1,
+          y: 0
+        }} transition={{
+          duration: 0.5,
+          delay: 0.4
+        }} className="bg-ti-white rounded-input border border-ti-grey-200 p-8 text-center">
             <h2 className="text-2xl font-bold text-ti-black mb-4">
               Dashboard Coming Soon
             </h2>
@@ -92,6 +100,5 @@ export default function Dashboard() {
           </motion.div>
         </motion.div>
       </main>
-    </div>
-  );
+    </div>;
 }
