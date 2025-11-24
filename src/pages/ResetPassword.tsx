@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { ValidationIndicator, ValidationState } from "@/components/auth/ValidationIndicator";
-import { PasswordStrengthMeter } from "@/components/auth/PasswordStrengthMeter";
+import { PasswordRulesIndicator } from "@/components/auth/PasswordRulesIndicator";
 import { WelcomeTransition } from "@/components/auth/WelcomeTransition";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -39,27 +39,29 @@ export default function ResetPassword() {
     return null;
   }
 
-  const handlePasswordBlur = () => {
-    if (!password) {
+  const handlePasswordChange = (value: string) => {
+    setPassword(value);
+    if (!value) {
       setPasswordValidation("default");
       return;
     }
-    const result = validatePassword(password);
+    const result = validatePassword(value);
     setPasswordValidation(result.isValid ? "valid" : "invalid");
     
     // Revalidate confirm password if it has a value
     if (confirmPassword) {
-      const matchResult = validatePasswordMatch(password, confirmPassword);
+      const matchResult = validatePasswordMatch(value, confirmPassword);
       setConfirmPasswordValidation(matchResult.isValid ? "valid" : "invalid");
     }
   };
 
-  const handleConfirmPasswordBlur = () => {
-    if (!confirmPassword) {
+  const handleConfirmPasswordChange = (value: string) => {
+    setConfirmPassword(value);
+    if (!value) {
       setConfirmPasswordValidation("default");
       return;
     }
-    const result = validatePasswordMatch(password, confirmPassword);
+    const result = validatePasswordMatch(password, value);
     setConfirmPasswordValidation(result.isValid ? "valid" : "invalid");
   };
 
@@ -154,8 +156,7 @@ export default function ResetPassword() {
                     type={showPassword ? "text" : "password"}
                     placeholder="Create a strong password"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    onBlur={handlePasswordBlur}
+                    onChange={(e) => handlePasswordChange(e.target.value)}
                     className="pr-20"
                     required
                     autoFocus
@@ -172,7 +173,7 @@ export default function ResetPassword() {
                     </button>
                   </div>
                 </div>
-                <PasswordStrengthMeter password={password} />
+                <PasswordRulesIndicator password={password} />
               </div>
 
               {/* Confirm New Password */}
@@ -186,8 +187,7 @@ export default function ResetPassword() {
                     type={showConfirmPassword ? "text" : "password"}
                     placeholder="Re-enter your password"
                     value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    onBlur={handleConfirmPasswordBlur}
+                    onChange={(e) => handleConfirmPasswordChange(e.target.value)}
                     className="pr-20"
                     required
                   />

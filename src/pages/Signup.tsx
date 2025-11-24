@@ -4,7 +4,7 @@ import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { ValidationIndicator, ValidationState } from "@/components/auth/ValidationIndicator";
 import { WelcomeTransition } from "@/components/auth/WelcomeTransition";
-import { PasswordStrengthMeter } from "@/components/auth/PasswordStrengthMeter";
+import { PasswordRulesIndicator } from "@/components/auth/PasswordRulesIndicator";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -48,36 +48,39 @@ export default function Signup() {
   // Error message
   const [errorMessage, setErrorMessage] = useState("");
 
-  // Validation handlers
-  const handleFirstNameBlur = () => {
-    if (!firstName) {
+  // Real-time validation handlers
+  const handleFirstNameChange = (value: string) => {
+    setFirstName(value);
+    if (!value) {
       setFirstNameValidation("default");
       return;
     }
-    const result = validateName(firstName, "First name");
+    const result = validateName(value, "First name");
     setFirstNameValidation(result.isValid ? "valid" : "invalid");
   };
 
-  const handleLastNameBlur = () => {
-    if (!lastName) {
+  const handleLastNameChange = (value: string) => {
+    setLastName(value);
+    if (!value) {
       setLastNameValidation("default");
       return;
     }
-    const result = validateName(lastName, "Last name");
+    const result = validateName(value, "Last name");
     setLastNameValidation(result.isValid ? "valid" : "invalid");
   };
 
-  const handleUsernameBlur = async () => {
-    if (!username) {
+  const handleUsernameChange = (value: string) => {
+    setUsername(value);
+    if (!value) {
       setUsernameValidation("default");
       return;
     }
-    
-    const result = validateUsername(username);
-    if (!result.isValid) {
-      setUsernameValidation("invalid");
-      return;
-    }
+    const result = validateUsername(value);
+    setUsernameValidation(result.isValid ? "valid" : "invalid");
+  };
+
+  const handleUsernameBlur = async () => {
+    if (!username || usernameValidation !== "valid") return;
     
     // API Integration Point: Check username availability
     // GET /api/auth/check-username?username={username}
@@ -90,17 +93,18 @@ export default function Signup() {
     setUsernameValidation(isAvailable ? "valid" : "invalid");
   };
 
-  const handleEmailBlur = async () => {
-    if (!email) {
+  const handleEmailChange = (value: string) => {
+    setEmail(value);
+    if (!value) {
       setEmailValidation("default");
       return;
     }
-    
-    const result = validateEmail(email);
-    if (!result.isValid) {
-      setEmailValidation("invalid");
-      return;
-    }
+    const result = validateEmail(value);
+    setEmailValidation(result.isValid ? "valid" : "invalid");
+  };
+
+  const handleEmailBlur = async () => {
+    if (!email || emailValidation !== "valid") return;
     
     // API Integration Point: Check email availability
     // GET /api/auth/check-email?email={email}
@@ -113,36 +117,39 @@ export default function Signup() {
     setEmailValidation(isAvailable ? "valid" : "invalid");
   };
 
-  const handlePhoneBlur = () => {
-    if (!phone) {
+  const handlePhoneChange = (value: string) => {
+    setPhone(value);
+    if (!value) {
       setPhoneValidation("default");
       return;
     }
-    const result = validatePhone(phone);
+    const result = validatePhone(value);
     setPhoneValidation(result.isValid ? "valid" : "invalid");
   };
 
-  const handlePasswordBlur = () => {
-    if (!password) {
+  const handlePasswordChange = (value: string) => {
+    setPassword(value);
+    if (!value) {
       setPasswordValidation("default");
       return;
     }
-    const result = validatePassword(password);
+    const result = validatePassword(value);
     setPasswordValidation(result.isValid ? "valid" : "invalid");
     
     // Revalidate confirm password if it has a value
     if (confirmPassword) {
-      const matchResult = validatePasswordMatch(password, confirmPassword);
+      const matchResult = validatePasswordMatch(value, confirmPassword);
       setConfirmPasswordValidation(matchResult.isValid ? "valid" : "invalid");
     }
   };
 
-  const handleConfirmPasswordBlur = () => {
-    if (!confirmPassword) {
+  const handleConfirmPasswordChange = (value: string) => {
+    setConfirmPassword(value);
+    if (!value) {
       setConfirmPasswordValidation("default");
       return;
     }
-    const result = validatePasswordMatch(password, confirmPassword);
+    const result = validatePasswordMatch(password, value);
     setConfirmPasswordValidation(result.isValid ? "valid" : "invalid");
   };
 
@@ -257,8 +264,7 @@ export default function Signup() {
                     type="text"
                     placeholder="John"
                     value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                    onBlur={handleFirstNameBlur}
+                    onChange={(e) => handleFirstNameChange(e.target.value)}
                     className="pr-10"
                     required
                   />
@@ -279,8 +285,7 @@ export default function Signup() {
                     type="text"
                     placeholder="Doe"
                     value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
-                    onBlur={handleLastNameBlur}
+                    onChange={(e) => handleLastNameChange(e.target.value)}
                     className="pr-10"
                     required
                   />
@@ -301,7 +306,7 @@ export default function Signup() {
                     type="text"
                     placeholder="johndoe"
                     value={username}
-                    onChange={(e) => setUsername(e.target.value)}
+                    onChange={(e) => handleUsernameChange(e.target.value)}
                     onBlur={handleUsernameBlur}
                     className="pr-10"
                     required
@@ -323,7 +328,7 @@ export default function Signup() {
                     type="email"
                     placeholder="john.doe@example.com"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => handleEmailChange(e.target.value)}
                     onBlur={handleEmailBlur}
                     className="pr-10"
                     required
@@ -345,8 +350,7 @@ export default function Signup() {
                     type="tel"
                     placeholder="+1234567890"
                     value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    onBlur={handlePhoneBlur}
+                    onChange={(e) => handlePhoneChange(e.target.value)}
                     className="pr-10"
                     required
                   />
@@ -368,8 +372,7 @@ export default function Signup() {
                     type={showPassword ? "text" : "password"}
                     placeholder="Create a strong password"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    onBlur={handlePasswordBlur}
+                    onChange={(e) => handlePasswordChange(e.target.value)}
                     className="pr-20"
                     required
                   />
@@ -385,7 +388,7 @@ export default function Signup() {
                     </button>
                   </div>
                 </div>
-                <PasswordStrengthMeter password={password} />
+                <PasswordRulesIndicator password={password} />
               </div>
 
               {/* Confirm Password */}
@@ -399,8 +402,7 @@ export default function Signup() {
                     type={showConfirmPassword ? "text" : "password"}
                     placeholder="Re-enter your password"
                     value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    onBlur={handleConfirmPasswordBlur}
+                    onChange={(e) => handleConfirmPasswordChange(e.target.value)}
                     className="pr-20"
                     required
                   />
