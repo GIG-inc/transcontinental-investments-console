@@ -29,30 +29,32 @@ export default function Login() {
   // Error message
   const [errorMessage, setErrorMessage] = useState("");
 
-  const handleEmailBlur = () => {
-    if (!emailOrUsername) {
+  const handleEmailChange = (value: string) => {
+    setEmailOrUsername(value);
+    if (!value) {
       setEmailValidation("default");
       return;
     }
     
     // Accept either email or username format
-    const isEmail = emailOrUsername.includes("@");
+    const isEmail = value.includes("@");
     if (isEmail) {
-      const result = validateEmail(emailOrUsername);
+      const result = validateEmail(value);
       setEmailValidation(result.isValid ? "valid" : "invalid");
     } else {
       // Basic username check (non-empty, reasonable length)
-      setEmailValidation(emailOrUsername.length >= 3 ? "valid" : "invalid");
+      setEmailValidation(value.length >= 3 ? "valid" : "invalid");
     }
   };
 
-  const handlePasswordBlur = () => {
-    if (!password) {
+  const handlePasswordChange = (value: string) => {
+    setPassword(value);
+    if (!value) {
       setPasswordValidation("default");
       return;
     }
     
-    const result = validatePassword(password);
+    const result = validatePassword(value);
     setPasswordValidation(result.isValid ? "valid" : "invalid");
   };
 
@@ -149,8 +151,7 @@ export default function Login() {
                     type="text"
                     placeholder="your.email@example.com"
                     value={emailOrUsername}
-                    onChange={(e) => setEmailOrUsername(e.target.value)}
-                    onBlur={handleEmailBlur}
+                    onChange={(e) => handleEmailChange(e.target.value)}
                     className="pr-10"
                     required
                     aria-describedby="email-validation"
@@ -175,8 +176,7 @@ export default function Login() {
                     type={showPassword ? "text" : "password"}
                     placeholder="Enter your password"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    onBlur={handlePasswordBlur}
+                    onChange={(e) => handlePasswordChange(e.target.value)}
                     className="pr-20"
                     required
                     aria-describedby="password-validation"

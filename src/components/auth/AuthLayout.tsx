@@ -15,7 +15,7 @@ export const AuthLayout = ({ children }: AuthLayoutProps) => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.6, ease: [0.2, 0.8, 0.2, 1] }}
-        className="auth-split-left w-full md:w-3/4 min-h-[40vh] md:min-h-screen flex flex-col justify-center items-center p-8 md:p-16"
+        className="auth-split-left w-full md:w-3/5 min-h-[40vh] md:min-h-screen flex flex-col justify-center items-center p-8 md:p-16"
         style={{
           backgroundImage: `url(${patternDark})`,
           backgroundSize: 'cover',
@@ -77,7 +77,7 @@ export const AuthLayout = ({ children }: AuthLayoutProps) => {
         initial={{ opacity: 0, x: 24 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.45, delay: 0.15, ease: [0.2, 0.8, 0.2, 1] }}
-        className="auth-split-right w-full md:w-1/4 min-h-screen flex items-center justify-center p-6 md:p-8"
+        className="auth-split-right w-full md:w-2/5 min-h-screen flex items-center justify-center p-6 md:p-8"
       >
         <div className="w-full max-w-md">
           {children}
