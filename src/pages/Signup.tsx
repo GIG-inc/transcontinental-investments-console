@@ -17,7 +17,7 @@ import {
   validatePassword,
   validatePasswordMatch,
 } from "@/lib/validation";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, number } from "framer-motion";
 
 export default function Signup() {
   const navigate = useNavigate();
@@ -170,13 +170,13 @@ export default function Signup() {
     
     // Check all validations
     const allValid = [
-      firstNameValidation,
-      lastNameValidation,
-      usernameValidation,
+      // firstNameValidation,
+      // lastNameValidation,
+      // usernameValidation,
       emailValidation,
-      phoneValidation,
+      // phoneValidation,
       passwordValidation,
-      confirmPasswordValidation
+      // confirmPasswordValidation
     ].every(state => state === "valid");
     
     if (!allValid) {
@@ -185,31 +185,54 @@ export default function Signup() {
     }
     
     setLoading(true);
-    
-    try {
-      // API Integration Point: POST /api/auth/signup
-      // Expected payload: {
-      //   firstName, lastName, username, email, phone, password
-      // }
-      // Expected response: { success: boolean, user: { id, email, firstName }, token: string }
-      // Error codes: 400 (validation), 409 (conflict - username/email taken), 500 (server error)
       
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Mock successful signup
-      const mockSuccess = true;
-      
-      if (mockSuccess) {
-        setShowWelcome(true);
-      } else {
-        setErrorMessage("Registration failed. Please try again.");
-      }
-    } catch (error) {
-      setErrorMessage("An error occurred. Please try again.");
-    } finally {
-      setLoading(false);
+  try {
+    setLoading(true);
+    setErrorMessage("");
+
+    const payload = {
+      fullname: `${firstName} ${lastName}`,
+      username,
+      email,
+      phonenumber: phone,
+      password
+    };
+    console.log(JSON.stringify(payload));
+    const response = await fetch("http://localhost:7000/api/createuser", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
     }
+   
+
+  );
+
+    if (!response.ok) {
+      if (response.status === 400) {
+        throw new Error("Validation failed. Check your input.");
+      } else if (response.status === 409) {
+        throw new Error("Username or email already exists.");
+      } else {
+        throw new Error("Server error. Please try again later.");
+      }
+    }
+
+    const data = await response.json();
+
+    if (data.success) {
+      setShowWelcome(true);
+      // store token if needed: localStorage.setItem("token", data.token);
+    } else {
+      setErrorMessage("Registration failed. Please try again.");
+    }
+  } catch (error) {
+    setErrorMessage(error.message);
+  } finally {
+    setLoading(false);
+  }
+
   };
 
   const handleWelcomeComplete = () => {
