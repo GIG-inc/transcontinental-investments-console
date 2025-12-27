@@ -1,10 +1,11 @@
-import { useState, FormEvent } from "react";
+import { useState, useEffect, FormEvent } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { ValidationIndicator, ValidationState } from "@/components/auth/ValidationIndicator";
 import { PasswordRulesIndicator } from "@/components/auth/PasswordRulesIndicator";
 import { WelcomeTransition } from "@/components/auth/WelcomeTransition";
+import { AuthFormSkeleton } from "@/components/auth/AuthFormSkeleton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,6 +18,7 @@ export default function ResetPassword() {
   const resetToken = location.state?.resetToken || "";
   const emailOrUsername = location.state?.emailOrUsername || "";
   
+  const [isPageLoading, setIsPageLoading] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -29,6 +31,12 @@ export default function ResetPassword() {
   // Validation states
   const [passwordValidation, setPasswordValidation] = useState<ValidationState>("default");
   const [confirmPasswordValidation, setConfirmPasswordValidation] = useState<ValidationState>("default");
+
+  // Page load simulation
+  useEffect(() => {
+    const timer = setTimeout(() => setIsPageLoading(false), 600);
+    return () => clearTimeout(timer);
+  }, []);
   
   // Error message
   const [errorMessage, setErrorMessage] = useState("");
@@ -112,13 +120,16 @@ export default function ResetPassword() {
   return (
     <>
       <AuthLayout>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.2 }}
-        >
-          <div className="space-y-6">
-            {/* Header */}
+        {isPageLoading ? (
+          <AuthFormSkeleton type="reset" />
+        ) : (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.2 }}
+          >
+            <div className="space-y-6">
+              {/* Header */}
             <div className="space-y-2 text-center md:text-left">
               <h2 className="text-2xl font-bold tracking-tight text-ti-black">
                 Create new password
@@ -222,9 +233,10 @@ export default function ResetPassword() {
                   "Reset Password"
                 )}
               </Button>
-            </form>
-          </div>
-        </motion.div>
+              </form>
+            </div>
+          </motion.div>
+        )}
       </AuthLayout>
 
       {/* Success Transition */}

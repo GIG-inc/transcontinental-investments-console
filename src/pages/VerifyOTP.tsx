@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { OTPInput } from "@/components/auth/OTPInput";
+import { AuthFormSkeleton } from "@/components/auth/AuthFormSkeleton";
 import { validateOTP } from "@/lib/validation";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -14,10 +15,17 @@ export default function VerifyOTP() {
   const location = useLocation();
   const emailOrUsername = location.state?.emailOrUsername || "";
   
+  const [isPageLoading, setIsPageLoading] = useState(true);
   const [countdown, setCountdown] = useState(COUNTDOWN_DURATION);
   const [canResend, setCanResend] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [isVerifying, setIsVerifying] = useState(false);
+
+  // Page load simulation
+  useEffect(() => {
+    const timer = setTimeout(() => setIsPageLoading(false), 600);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     // Redirect back if no email/username provided
@@ -106,33 +114,36 @@ export default function VerifyOTP() {
 
   return (
     <AuthLayout>
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.2 }}
-      >
-        <div className="space-y-6">
-          {/* Back button */}
-          <button
-            onClick={() => navigate("/auth/forgot-password")}
-            className="flex items-center gap-2 text-sm font-medium text-ti-grey-600 hover:text-ti-black transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Back
-          </button>
+      {isPageLoading ? (
+        <AuthFormSkeleton type="otp" />
+      ) : (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.2 }}
+        >
+          <div className="space-y-6">
+            {/* Back button */}
+            <button
+              onClick={() => navigate("/auth/forgot-password")}
+              className="flex items-center gap-2 text-sm font-medium text-ti-grey-600 hover:text-ti-black transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back
+            </button>
 
-          {/* Header */}
-          <div className="space-y-2 text-center">
-            <h2 className="text-2xl font-bold tracking-tight text-ti-black">
-              Enter verification code
-            </h2>
-            <p className="text-sm text-ti-grey-500">
-              We sent a {OTP_LENGTH}-digit code to
-            </p>
-            <p className="text-sm font-semibold text-ti-black">
-              {emailOrUsername}
-            </p>
-          </div>
+            {/* Header */}
+            <div className="space-y-2 text-center">
+              <h2 className="text-2xl font-bold tracking-tight text-ti-black">
+                Enter verification code
+              </h2>
+              <p className="text-sm text-ti-grey-500">
+                We sent a {OTP_LENGTH}-digit code to
+              </p>
+              <p className="text-sm font-semibold text-ti-black">
+                {emailOrUsername}
+              </p>
+            </div>
 
           {/* Error Message */}
           <AnimatePresence mode="wait">
@@ -185,8 +196,9 @@ export default function VerifyOTP() {
               </a>
             </p>
           </div>
-        </div>
-      </motion.div>
+          </div>
+        </motion.div>
+      )}
     </AuthLayout>
   );
 }

@@ -1,9 +1,10 @@
-import { useState, FormEvent } from "react";
+import { useState, useEffect, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { ValidationIndicator, ValidationState } from "@/components/auth/ValidationIndicator";
 import { WelcomeTransition } from "@/components/auth/WelcomeTransition";
+import { AuthFormSkeleton } from "@/components/auth/AuthFormSkeleton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -13,7 +14,14 @@ import { motion, AnimatePresence } from "framer-motion";
 
 export default function Login() {
   const navigate = useNavigate();
+  const [isPageLoading, setIsPageLoading] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
+
+  // Simulate initial page load
+  useEffect(() => {
+    const timer = setTimeout(() => setIsPageLoading(false), 600);
+    return () => clearTimeout(timer);
+  }, []);
   const [loading, setLoading] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
@@ -107,13 +115,16 @@ export default function Login() {
   return (
     <>
       <AuthLayout>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.2 }}
-        >
-          <div className="space-y-6">
-            {/* Header */}
+        {isPageLoading ? (
+          <AuthFormSkeleton type="login" />
+        ) : (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.2 }}
+          >
+            <div className="space-y-6">
+              {/* Header */}
             <div className="space-y-2 text-center md:text-left">
               <h2 className="text-2xl font-bold tracking-tight text-ti-black">
                 Sign in to your account
@@ -258,9 +269,10 @@ export default function Login() {
                   </button>
                 </p>
               </div>
-            </form>
-          </div>
-        </motion.div>
+              </form>
+            </div>
+          </motion.div>
+        )}
       </AuthLayout>
 
       {/* Welcome Transition */}

@@ -1,10 +1,11 @@
-import { useState, FormEvent } from "react";
+import { useState, useEffect, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { ValidationIndicator, ValidationState } from "@/components/auth/ValidationIndicator";
 import { WelcomeTransition } from "@/components/auth/WelcomeTransition";
 import { PasswordRulesIndicator } from "@/components/auth/PasswordRulesIndicator";
+import { AuthFormSkeleton } from "@/components/auth/AuthFormSkeleton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -17,10 +18,17 @@ import {
   validatePassword,
   validatePasswordMatch,
 } from "@/lib/validation";
-import { motion, AnimatePresence, number } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function Signup() {
   const navigate = useNavigate();
+  const [isPageLoading, setIsPageLoading] = useState(true);
+
+  // Simulate initial page load
+  useEffect(() => {
+    const timer = setTimeout(() => setIsPageLoading(false), 600);
+    return () => clearTimeout(timer);
+  }, []);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -242,22 +250,25 @@ export default function Signup() {
   return (
     <>
       <AuthLayout>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.2 }}
-          className="max-h-[90vh] overflow-y-auto pr-2"
-        >
-          <div className="space-y-6">
-            {/* Header */}
-            <div className="space-y-2 text-center md:text-left">
-              <h2 className="text-2xl font-bold tracking-tight text-ti-black">
-                Create your account
-              </h2>
-              <p className="text-sm text-ti-grey-500">
-                Join Transcontinental Investments today
-              </p>
-            </div>
+        {isPageLoading ? (
+          <AuthFormSkeleton type="signup" />
+        ) : (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.2 }}
+            className="max-h-[90vh] overflow-y-auto pr-2"
+          >
+            <div className="space-y-6">
+              {/* Header */}
+              <div className="space-y-2 text-center md:text-left">
+                <h2 className="text-2xl font-bold tracking-tight text-ti-black">
+                  Create your account
+                </h2>
+                <p className="text-sm text-ti-grey-500">
+                  Join Transcontinental Investments today
+                </p>
+              </div>
 
             {/* Error Message */}
             <AnimatePresence mode="wait">
@@ -497,6 +508,7 @@ export default function Signup() {
             </form>
           </div>
         </motion.div>
+        )}
       </AuthLayout>
 
       {/* Welcome Transition */}
