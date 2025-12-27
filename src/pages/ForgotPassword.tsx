@@ -1,8 +1,9 @@
-import { useState, FormEvent } from "react";
+import { useState, useEffect, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { Loader2, ArrowLeft } from "lucide-react";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { ValidationIndicator, ValidationState } from "@/components/auth/ValidationIndicator";
+import { AuthFormSkeleton } from "@/components/auth/AuthFormSkeleton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,7 +12,14 @@ import { motion, AnimatePresence } from "framer-motion";
 
 export default function ForgotPassword() {
   const navigate = useNavigate();
+  const [isPageLoading, setIsPageLoading] = useState(true);
   const [loading, setLoading] = useState(false);
+
+  // Simulate initial page load
+  useEffect(() => {
+    const timer = setTimeout(() => setIsPageLoading(false), 600);
+    return () => clearTimeout(timer);
+  }, []);
   
   // Form state
   const [emailOrUsername, setEmailOrUsername] = useState("");
@@ -23,19 +31,21 @@ export default function ForgotPassword() {
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
-  const handleEmailBlur = () => {
-    if (!emailOrUsername) {
+  // Real-time validation on change
+  const handleEmailChange = (value: string) => {
+    setEmailOrUsername(value);
+    if (!value) {
       setEmailValidation("default");
       return;
     }
     
     // Accept either email or username format
-    const isEmail = emailOrUsername.includes("@");
+    const isEmail = value.includes("@");
     if (isEmail) {
-      const result = validateEmail(emailOrUsername);
+      const result = validateEmail(value);
       setEmailValidation(result.isValid ? "valid" : "invalid");
     } else {
-      setEmailValidation(emailOrUsername.length >= 3 ? "valid" : "invalid");
+      setEmailValidation(value.length >= 3 ? "valid" : "invalid");
     }
   };
 
@@ -90,30 +100,33 @@ export default function ForgotPassword() {
 
   return (
     <AuthLayout>
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.2 }}
-      >
-        <div className="space-y-6">
-          {/* Back button */}
-          <button
-            onClick={() => navigate("/auth/login")}
-            className="flex items-center gap-2 text-sm font-medium text-ti-grey-600 hover:text-ti-black transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Back to sign in
-          </button>
+      {isPageLoading ? (
+        <AuthFormSkeleton type="forgot" />
+      ) : (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.2 }}
+        >
+          <div className="space-y-6">
+            {/* Back button */}
+            <button
+              onClick={() => navigate("/auth/login")}
+              className="flex items-center gap-2 text-sm font-medium text-ti-grey-600 hover:text-ti-black transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back to sign in
+            </button>
 
-          {/* Header */}
-          <div className="space-y-2 text-center md:text-left">
-            <h2 className="text-2xl font-bold tracking-tight text-ti-black">
-              Reset your password
-            </h2>
-            <p className="text-sm text-ti-grey-500">
-              Enter your email or username and we'll send you a verification code
-            </p>
-          </div>
+            {/* Header */}
+            <div className="space-y-2 text-center md:text-left">
+              <h2 className="text-2xl font-bold tracking-tight text-ti-black">
+                Reset your password
+              </h2>
+              <p className="text-sm text-ti-grey-500">
+                Enter your email or username and we'll send you a verification code
+              </p>
+            </div>
 
           {/* Success Message */}
           <AnimatePresence mode="wait">
@@ -152,18 +165,17 @@ export default function ForgotPassword() {
               <Label htmlFor="emailOrUsername" className="text-sm font-semibold text-ti-black">
                 Email or Username
               </Label>
-              <div className="relative">
-                <Input
-                  id="emailOrUsername"
-                  type="text"
-                  placeholder="your.email@example.com"
-                  value={emailOrUsername}
-                  onChange={(e) => setEmailOrUsername(e.target.value)}
-                  onBlur={handleEmailBlur}
-                  className="pr-10"
-                  required
-                  autoFocus
-                />
+                <div className="relative">
+                  <Input
+                    id="emailOrUsername"
+                    type="text"
+                    placeholder="your.email@example.com"
+                    value={emailOrUsername}
+                    onChange={(e) => handleEmailChange(e.target.value)}
+                    className="pr-10"
+                    required
+                    autoFocus
+                  />
                 <div className="absolute right-3 top-1/2 -translate-y-1/2">
                   <ValidationIndicator
                     state={emailValidation}
@@ -203,6 +215,7 @@ export default function ForgotPassword() {
           </form>
         </div>
       </motion.div>
+      )}
     </AuthLayout>
   );
 }
