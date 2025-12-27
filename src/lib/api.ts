@@ -47,6 +47,27 @@ interface ApiResponse<T> {
   status: number;
 }
 
+// Response types
+interface LoginResponse {
+  success: boolean;
+  user?: { id: string; email: string; firstName: string; lastName: string };
+  token?: string;
+}
+
+interface SignupResponse {
+  success: boolean;
+  token?: string;
+}
+
+interface VerifyOtpResponse {
+  success: boolean;
+  resetToken?: string;
+}
+
+interface CheckAvailabilityResponse {
+  available: boolean;
+}
+
 export async function apiRequest<T>(
   url: string,
   options: RequestInit = {}
@@ -84,7 +105,7 @@ export async function apiRequest<T>(
 // Auth-specific API functions
 export const authApi = {
   login: (credentials: { identifier: string; password: string }) =>
-    apiRequest(API_ROUTES.auth.login, {
+    apiRequest<LoginResponse>(API_ROUTES.auth.login, {
       method: 'POST',
       body: JSON.stringify(credentials),
     }),
@@ -97,7 +118,7 @@ export const authApi = {
     phone: string;
     password: string;
   }) =>
-    apiRequest(API_ROUTES.auth.signup, {
+    apiRequest<SignupResponse>(API_ROUTES.auth.signup, {
       method: 'POST',
       body: JSON.stringify(userData),
     }),
@@ -114,7 +135,7 @@ export const authApi = {
     }),
 
   verifyOtp: (data: { identifier: string; otp: string }) =>
-    apiRequest(API_ROUTES.auth.verifyOtp, {
+    apiRequest<VerifyOtpResponse>(API_ROUTES.auth.verifyOtp, {
       method: 'POST',
       body: JSON.stringify(data),
     }),
@@ -132,13 +153,13 @@ export const authApi = {
     }),
 
   checkUsername: (username: string) =>
-    apiRequest<{ available: boolean }>(API_ROUTES.auth.checkUsername, {
+    apiRequest<CheckAvailabilityResponse>(API_ROUTES.auth.checkUsername, {
       method: 'POST',
       body: JSON.stringify({ username }),
     }),
 
   checkEmail: (email: string) =>
-    apiRequest<{ available: boolean }>(API_ROUTES.auth.checkEmail, {
+    apiRequest<CheckAvailabilityResponse>(API_ROUTES.auth.checkEmail, {
       method: 'POST',
       body: JSON.stringify({ email }),
     }),

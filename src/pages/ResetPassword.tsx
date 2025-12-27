@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { validatePassword, validatePasswordMatch } from "@/lib/validation";
+import { authApi } from "@/lib/api";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function ResetPassword() {
@@ -90,22 +91,23 @@ export default function ResetPassword() {
     setLoading(true);
     
     try {
-      // API Integration Point: POST /api/auth/reset-password
-      // Expected payload: { resetToken: string, newPassword: string }
-      // Expected response: { success: boolean, message: string }
-      // Error codes: 400 (validation), 401 (invalid/expired token), 500 (server error)
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Mock successful reset
-      const mockSuccess = true;
-      
-      if (mockSuccess) {
-        setShowSuccess(true);
-      } else {
-        setErrorMessage("Failed to reset password. Please try again.");
+      const response = await authApi.resetPassword({
+        token: resetToken,
+        password,
+      });
+
+      if (response.error) {
+        if (response.status === 400) {
+          setErrorMessage("Password does not meet requirements.");
+        } else if (response.status === 401) {
+          setErrorMessage("Reset link has expired. Please request a new one.");
+        } else {
+          setErrorMessage(response.error);
+        }
+        return;
       }
+
+      setShowSuccess(true);
     } catch (error) {
       setErrorMessage("An error occurred. Please try again.");
     } finally {

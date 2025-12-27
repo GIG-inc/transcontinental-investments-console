@@ -5,6 +5,7 @@ import { AuthLayout } from "@/components/auth/AuthLayout";
 import { OTPInput } from "@/components/auth/OTPInput";
 import { AuthFormSkeleton } from "@/components/auth/AuthFormSkeleton";
 import { validateOTP } from "@/lib/validation";
+import { authApi } from "@/lib/api";
 import { motion, AnimatePresence } from "framer-motion";
 
 const OTP_LENGTH = 6;
@@ -55,26 +56,28 @@ export default function VerifyOTP() {
     setIsVerifying(true);
     
     try {
-      // API Integration Point: POST /api/auth/verify-otp
-      // Expected payload: { emailOrUsername: string, otp: string }
-      // Expected response: { success: boolean, resetToken: string }
-      // Error codes: 400 (invalid OTP), 401 (expired OTP), 429 (rate limit), 500 (server error)
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Mock successful verification
-      const mockSuccess = true;
-      const mockResetToken = "mock_reset_token_123";
-      
-      if (mockSuccess) {
-        // Navigate to reset password page with token
-        navigate("/auth/reset-password", {
-          state: { resetToken: mockResetToken, emailOrUsername }
-        });
-      } else {
-        setErrorMessage("Invalid or expired OTP. Please try again.");
+      const response = await authApi.verifyOtp({
+        identifier: emailOrUsername,
+        otp,
+      });
+
+      if (response.error) {
+        if (response.status === 400) {
+          setErrorMessage("Invalid OTP. Please check and try again.");
+        } else if (response.status === 401) {
+          setErrorMessage("OTP has expired. Please request a new one.");
+        } else if (response.status === 429) {
+          setErrorMessage("Too many attempts. Please try again later.");
+        } else {
+          setErrorMessage(response.error);
+        }
+        return;
       }
+
+      // Navigate to reset password page with token
+      navigate("/auth/reset-password", {
+        state: { resetToken: response.data?.resetToken, emailOrUsername }
+      });
     } catch (error) {
       setErrorMessage("Verification failed. Please try again.");
     } finally {
@@ -90,13 +93,14 @@ export default function VerifyOTP() {
     setCountdown(COUNTDOWN_DURATION);
     
     try {
-      // API Integration Point: POST /api/auth/request-reset (same as forgot password)
-      // Expected payload: { emailOrUsername: string }
-      // Expected response: { success: boolean }
+      const response = await authApi.resendOtp(emailOrUsername);
       
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
+      if (response.error) {
+        setErrorMessage("Failed to resend code. Please try again.");
+        setCanResend(true);
+        return;
+      }
+
       // Show success feedback via live region
       const message = document.createElement('div');
       message.setAttribute('role', 'status');
