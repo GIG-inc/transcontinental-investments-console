@@ -104,7 +104,7 @@ export async function apiRequest<T>(
 
 // Auth-specific API functions
 export const authApi = {
-  login: (credentials: { identifier: string; password: string }) =>
+  login: (credentials: { email: string; password: string }) =>
     apiRequest<LoginResponse>(API_ROUTES.auth.login, {
       method: 'POST',
       body: JSON.stringify(credentials),

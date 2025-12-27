@@ -86,7 +86,7 @@ export default function Login() {
     
     try {
       const response = await authApi.login({
-        identifier: emailOrUsername,
+        email: emailOrUsername,
         password,
       });
 
