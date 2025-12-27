@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { validateEmail, validatePassword } from "@/lib/validation";
+import { authApi } from "@/lib/api";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function Login() {
@@ -84,22 +85,29 @@ export default function Login() {
     setLoading(true);
     
     try {
-      // API Integration Point: POST /api/auth/login
-      // Expected payload: { emailOrUsername: string, password: string, rememberMe: boolean }
-      // Expected response: { success: boolean, user: { id, email, firstName, lastName }, token: string }
-      // Error codes: 401 (invalid credentials), 429 (rate limit), 500 (server error)
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Mock successful login
-      const mockSuccess = true;
-      
-      if (mockSuccess) {
-        setShowWelcome(true);
-      } else {
-        setErrorMessage("Invalid email/username or password");
+      const response = await authApi.login({
+        identifier: emailOrUsername,
+        password,
+      });
+
+      if (response.error) {
+        if (response.status === 401) {
+          setErrorMessage("Invalid email/username or password");
+        } else if (response.status === 429) {
+          setErrorMessage("Too many attempts. Please try again later.");
+        } else {
+          setErrorMessage(response.error);
+        }
+        return;
       }
+
+      // Store token if provided
+      if (response.data?.token) {
+        const storage = rememberMe ? localStorage : sessionStorage;
+        storage.setItem("auth_token", response.data.token);
+      }
+
+      setShowWelcome(true);
     } catch (error) {
       setErrorMessage("An error occurred. Please try again.");
     } finally {

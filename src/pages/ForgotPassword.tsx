@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { validateEmail } from "@/lib/validation";
+import { authApi } from "@/lib/api";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function ForgotPassword() {
@@ -67,30 +68,30 @@ export default function ForgotPassword() {
     setLoading(true);
     
     try {
-      // API Integration Point: POST /api/auth/request-reset
-      // Expected payload: { emailOrUsername: string }
-      // Expected response: { success: boolean, message: string }
-      // Error codes: 404 (user not found), 429 (rate limit), 500 (server error)
-      // Note: For security, even if user not found, show success message
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Mock successful request
-      const mockSuccess = true;
-      
-      if (mockSuccess) {
-        setSuccessMessage("OTP sent! Check your email and enter the code below.");
-        
-        // Navigate to OTP verification after short delay
-        setTimeout(() => {
-          navigate("/auth/verify-otp", { 
-            state: { emailOrUsername } 
-          });
-        }, 1500);
-      } else {
-        setErrorMessage("Failed to send reset code. Please try again.");
+      const response = await authApi.forgotPassword(emailOrUsername);
+
+      if (response.error) {
+        if (response.status === 429) {
+          setErrorMessage("Too many attempts. Please try again later.");
+        } else {
+          // For security, show success even if user not found
+          setSuccessMessage("If an account exists, you will receive a verification code.");
+          setTimeout(() => {
+            navigate("/auth/verify-otp", { 
+              state: { emailOrUsername } 
+            });
+          }, 1500);
+        }
+        return;
       }
+
+      setSuccessMessage("OTP sent! Check your email and enter the code below.");
+      
+      setTimeout(() => {
+        navigate("/auth/verify-otp", { 
+          state: { emailOrUsername } 
+        });
+      }, 1500);
     } catch (error) {
       setErrorMessage("An error occurred. Please try again.");
     } finally {

@@ -18,6 +18,7 @@ import {
   validatePassword,
   validatePasswordMatch,
 } from "@/lib/validation";
+import { authApi } from "@/lib/api";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function Signup() {
@@ -90,15 +91,14 @@ export default function Signup() {
   const handleUsernameBlur = async () => {
     if (!username || usernameValidation !== "valid") return;
     
-    // API Integration Point: Check username availability
-    // GET /api/auth/check-username?username={username}
-    // Response: { available: boolean }
-    
-    // Simulate API check
-    await new Promise(resolve => setTimeout(resolve, 300));
-    const isAvailable = true; // Mock response
-    
-    setUsernameValidation(isAvailable ? "valid" : "invalid");
+    try {
+      const response = await authApi.checkUsername(username);
+      if (response.data) {
+        setUsernameValidation(response.data.available ? "valid" : "invalid");
+      }
+    } catch (error) {
+      // Keep current validation state on error
+    }
   };
 
   const handleEmailChange = (value: string) => {
@@ -114,15 +114,14 @@ export default function Signup() {
   const handleEmailBlur = async () => {
     if (!email || emailValidation !== "valid") return;
     
-    // API Integration Point: Check email availability
-    // GET /api/auth/check-email?email={email}
-    // Response: { available: boolean }
-    
-    // Simulate API check
-    await new Promise(resolve => setTimeout(resolve, 300));
-    const isAvailable = true; // Mock response
-    
-    setEmailValidation(isAvailable ? "valid" : "invalid");
+    try {
+      const response = await authApi.checkEmail(email);
+      if (response.data) {
+        setEmailValidation(response.data.available ? "valid" : "invalid");
+      }
+    } catch (error) {
+      // Keep current validation state on error
+    }
   };
 
   const handlePhoneChange = (value: string) => {
@@ -193,54 +192,39 @@ export default function Signup() {
     }
     
     setLoading(true);
-      
-  try {
-    setLoading(true);
-    setErrorMessage("");
+    
+    try {
+      const response = await authApi.signup({
+        firstName,
+        lastName,
+        username,
+        email,
+        phone,
+        password,
+      });
 
-    const payload = {
-      fullname: `${firstName} ${lastName}`,
-      username,
-      email,
-      phonenumber: phone,
-      password
-    };
-    console.log(JSON.stringify(payload));
-    const response = await fetch("http://localhost:7000/api/createuser", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(payload)
-    }
-   
-
-  );
-
-    if (!response.ok) {
-      if (response.status === 400) {
-        throw new Error("Validation failed. Check your input.");
-      } else if (response.status === 409) {
-        throw new Error("Username or email already exists.");
-      } else {
-        throw new Error("Server error. Please try again later.");
+      if (response.error) {
+        if (response.status === 400) {
+          setErrorMessage("Validation failed. Check your input.");
+        } else if (response.status === 409) {
+          setErrorMessage("Username or email already exists.");
+        } else {
+          setErrorMessage(response.error);
+        }
+        return;
       }
-    }
 
-    const data = await response.json();
+      // Store token if provided
+      if (response.data?.token) {
+        localStorage.setItem("auth_token", response.data.token);
+      }
 
-    if (data.success) {
       setShowWelcome(true);
-      // store token if needed: localStorage.setItem("token", data.token);
-    } else {
-      setErrorMessage("Registration failed. Please try again.");
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : "An error occurred. Please try again.");
+    } finally {
+      setLoading(false);
     }
-  } catch (error) {
-    setErrorMessage(error.message);
-  } finally {
-    setLoading(false);
-  }
-
   };
 
   const handleWelcomeComplete = () => {
