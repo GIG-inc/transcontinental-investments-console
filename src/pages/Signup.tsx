@@ -241,7 +241,6 @@ export default function Signup() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.2 }}
-            className="max-h-[90vh] overflow-y-auto pr-2"
           >
             <div className="space-y-6">
               {/* Header */}
