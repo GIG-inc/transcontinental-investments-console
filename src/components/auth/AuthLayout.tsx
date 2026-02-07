@@ -8,7 +8,7 @@ interface AuthLayoutProps {
 export const AuthLayout = ({
   children
 }: AuthLayoutProps) => {
-  return <div className="min-h-screen h-screen flex flex-col md:flex-row overflow-hidden">
+  return <div className="min-h-screen flex flex-col md:flex-row">
       {/* Left Column - 75% on desktop, full width on mobile */}
       <motion.div initial={{
       opacity: 0
@@ -89,8 +89,8 @@ export const AuthLayout = ({
       duration: 0.45,
       delay: 0.15,
       ease: [0.2, 0.8, 0.2, 1]
-    }} className="auth-split-right w-full md:w-2/5 flex items-center justify-center p-6 md:p-8 md:py-12 md:overflow-y-auto">
-        <div className="w-full max-w-md">
+    }} className="auth-split-right w-full md:w-2/5 flex items-start md:items-center justify-center p-6 md:p-8 py-8 md:py-12 overflow-y-auto scroll-smooth scrollbar-thin scrollbar-thumb-ti-grey-300 scrollbar-track-transparent">
+        <div className="w-full max-w-md my-auto">
           {children}
         </div>
       </motion.div>
