@@ -195,12 +195,14 @@ export default function Signup() {
     
     try {
       const response = await authApi.signup({
-        firstName,
-        lastName,
-        username,
         email,
-        phone,
         password,
+        user_metadata: {
+          first_name: firstName,
+          last_name: lastName,
+          username,
+          phone,
+        },
       });
 
       if (response.error) {
