@@ -111,12 +111,14 @@ export const authApi = {
     }),
 
   signup: (userData: {
-    firstName: string;
-    lastName: string;
-    username: string;
     email: string;
-    phone: string;
     password: string;
+    user_metadata: {
+      first_name: string;
+      last_name: string;
+      username: string;
+      phone: string;
+    };
   }) =>
     apiRequest<SignupResponse>(API_ROUTES.auth.signup, {
       method: 'POST',
