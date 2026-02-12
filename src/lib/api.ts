@@ -28,15 +28,15 @@ export const API_BASE_URL = getBaseUrl();
 // API Route builders
 export const API_ROUTES = {
   auth: {
-    signup: `${API_BASE_URL}/internal/auth/signup`,
-    login: `${API_BASE_URL}/internal/auth/login`,
-    logout: `${API_BASE_URL}/internal/auth/logout`,
-    forgotPassword: `${API_BASE_URL}/internal/auth/forgot-password`,
-    verifyOtp: `${API_BASE_URL}/internal/auth/verify-otp`,
-    resetPassword: `${API_BASE_URL}/internal/auth/reset-password`,
-    resendOtp: `${API_BASE_URL}/internal/auth/resend-otp`,
-    checkUsername: `${API_BASE_URL}/internal/auth/check-username`,
-    checkEmail: `${API_BASE_URL}/internal/auth/check-email`,
+    signup: `${API_BASE_URL}/auth/signup`,
+    login: `${API_BASE_URL}/auth/login`,
+    logout: `${API_BASE_URL}/auth/logout`,
+    forgotPassword: `${API_BASE_URL}/auth/forgot-password`,
+    verifyOtp: `${API_BASE_URL}/auth/verify-otp`,
+    resetPassword: `${API_BASE_URL}/auth/reset-password`,
+    resendOtp: `${API_BASE_URL}/auth/resend-otp`,
+    checkUsername: `${API_BASE_URL}/auth/check-username`,
+    checkEmail: `${API_BASE_URL}/auth/check-email`,
   },
 } as const;
 
