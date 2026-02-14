@@ -216,10 +216,7 @@ export default function Signup() {
         return;
       }
 
-      // Store token if provided
-      if (response.data?.token) {
-        localStorage.setItem("auth_token", response.data.token);
-      }
+      // Cookies are set by the server (HttpOnly), no need to store tokens manually
 
       setShowWelcome(true);
     } catch (error) {

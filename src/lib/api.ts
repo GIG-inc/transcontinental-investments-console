@@ -48,15 +48,10 @@ interface ApiResponse<T> {
 }
 
 // Response types
-interface LoginResponse {
-  success: boolean;
-  user?: { id: string; email: string; firstName: string; lastName: string };
-  token?: string;
-}
-
-interface SignupResponse {
-  success: boolean;
-  token?: string;
+interface AuthResponse {
+  access_token: string;
+  refresh_token: string;
+  expires_in: number;
 }
 
 interface VerifyOtpResponse {
@@ -74,6 +69,7 @@ export async function apiRequest<T>(
 ): Promise<ApiResponse<T>> {
   try {
     const response = await fetch(url, {
+      credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
         ...options.headers,
@@ -105,7 +101,7 @@ export async function apiRequest<T>(
 // Auth-specific API functions
 export const authApi = {
   login: (credentials: { email: string; password: string }) =>
-    apiRequest<LoginResponse>(API_ROUTES.auth.login, {
+    apiRequest<AuthResponse>(API_ROUTES.auth.login, {
       method: 'POST',
       body: JSON.stringify(credentials),
     }),
@@ -120,7 +116,7 @@ export const authApi = {
       phone: string;
     };
   }) =>
-    apiRequest<SignupResponse>(API_ROUTES.auth.signup, {
+    apiRequest<AuthResponse>(API_ROUTES.auth.signup, {
       method: 'POST',
       body: JSON.stringify(userData),
     }),
