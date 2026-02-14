@@ -28,7 +28,7 @@ export default function Login() {
   const [rememberMe, setRememberMe] = useState(false);
   
   // Form state
-  const [emailOrUsername, setEmailOrUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   
   // Validation states
@@ -39,21 +39,13 @@ export default function Login() {
   const [errorMessage, setErrorMessage] = useState("");
 
   const handleEmailChange = (value: string) => {
-    setEmailOrUsername(value);
+    setEmail(value);
     if (!value) {
       setEmailValidation("default");
       return;
     }
-    
-    // Accept either email or username format
-    const isEmail = value.includes("@");
-    if (isEmail) {
-      const result = validateEmail(value);
-      setEmailValidation(result.isValid ? "valid" : "invalid");
-    } else {
-      // Basic username check (non-empty, reasonable length)
-      setEmailValidation(value.length >= 3 ? "valid" : "invalid");
-    }
+    const result = validateEmail(value);
+    setEmailValidation(result.isValid ? "valid" : "invalid");
   };
 
   const handlePasswordChange = (value: string) => {
@@ -72,7 +64,7 @@ export default function Login() {
     setErrorMessage("");
     
     // Validate all fields
-    if (!emailOrUsername || !password) {
+    if (!email || !password) {
       setErrorMessage("Please fill in all fields");
       return;
     }
@@ -86,13 +78,13 @@ export default function Login() {
     
     try {
       const response = await authApi.login({
-        email: emailOrUsername,
+        email,
         password,
       });
 
       if (response.error) {
         if (response.status === 401) {
-          setErrorMessage("Invalid email/username or password");
+          setErrorMessage("Invalid email or password");
         } else if (response.status === 429) {
           setErrorMessage("Too many attempts. Please try again later.");
         } else {
@@ -154,17 +146,17 @@ export default function Login() {
 
             {/* Form */}
             <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Email or Username */}
+              {/* Email */}
               <div className="space-y-2">
-                <Label htmlFor="emailOrUsername" className="text-sm font-semibold text-ti-black">
-                  Email or Username
+                <Label htmlFor="email" className="text-sm font-semibold text-ti-black">
+                  Email
                 </Label>
                 <div className="relative">
                   <Input
-                    id="emailOrUsername"
-                    type="text"
+                    id="email"
+                    type="email"
                     placeholder="your.email@example.com"
-                    value={emailOrUsername}
+                    value={email}
                     onChange={(e) => handleEmailChange(e.target.value)}
                     className="pr-10"
                     required
@@ -173,7 +165,7 @@ export default function Login() {
                   <div className="absolute right-3 top-1/2 -translate-y-1/2">
                     <ValidationIndicator
                       state={emailValidation}
-                      label="Email or username"
+                      label="Email"
                     />
                   </div>
                 </div>
